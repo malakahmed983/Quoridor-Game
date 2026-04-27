@@ -118,10 +118,10 @@ class GameBoard:
                     return False
                 # Check if there's a wall blocking the jump
                 if old_col < new_col:  # Moving right
-                    if self.v_walls[old_row][mid_col]:
+                    if old_row < len(self.v_walls) and self.v_walls[old_row][mid_col]:
                         return False
                 else:  # Moving left
-                    if self.v_walls[old_row][old_col]:
+                    if old_row < len(self.v_walls) and self.v_walls[old_row][old_col]:
                         return False
             else:  # Vertical jump
                 mid_row = (old_row + new_row) // 2
@@ -130,10 +130,10 @@ class GameBoard:
                     return False
                 # Check if there's a wall blocking the jump
                 if old_row < new_row:  # Moving down
-                    if self.h_walls[mid_row][old_col]:
+                    if mid_row < len(self.h_walls) and self.h_walls[mid_row][old_col]:
                         return False
                 else:  # Moving up
-                    if self.h_walls[old_row][old_col]:
+                    if old_row < len(self.h_walls) and self.h_walls[old_row][old_col]:
                         return False
             return True
         
@@ -144,17 +144,17 @@ class GameBoard:
         # Check for walls blocking normal movement
         if new_row == old_row:  # Horizontal movement
             if old_col < new_col:  # Moving right
-                if self.v_walls[old_row][new_col]:
+                if old_row < len(self.v_walls) and self.v_walls[old_row][new_col]:
                     return False
             else:  # Moving left
-                if self.v_walls[old_row][old_col]:
+                if old_row < len(self.v_walls) and self.v_walls[old_row][old_col]:
                     return False
         else:  # Vertical movement
             if old_row < new_row:  # Moving down
-                if self.h_walls[new_row][old_col]:
+                if new_row < len(self.h_walls) and self.h_walls[new_row][old_col]:
                     return False
             else:  # Moving up
-                if self.h_walls[old_row][old_col]:
+                if old_row < len(self.h_walls) and self.h_walls[old_row][old_col]:
                     return False
         
         # Check for blocking opponent (unless jumping)

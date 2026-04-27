@@ -113,39 +113,43 @@ class QuoridorAI:
 
     def _hard_move(self, board: GameBoard, player_id: int) -> Tuple[str, any]:
         """
-        Hard AI: Uses minimax with alpha-beta pruning
+        Hard AI: Uses strategic evaluation with lookahead
         Args:
             board: Current game board
             player_id: ID of the AI player
         Returns:
-            Best move from minimax analysis
+            Best move from strategic analysis
         """
         valid_moves = board.get_valid_moves(player_id)
         player = board.players[player_id]
+        opponent = board.get_opponent(player_id)
+        goal_row = 8 if player_id == 0 else 0
         
         if not valid_moves:
             return ("move", random.choice(valid_moves))
         
+        # Score each pawn move strategically
         best_move = None
         best_score = -float('inf')
-        alpha = -float('inf')
-        beta = float('inf')
         
-        # Evaluate pawn moves
-        for move in valid_moves:
-            board.move_pawn(player_id, move[0], move[1])
-            score = self._minimax(board, player_id, depth=2, is_maximizing=False, alpha=alpha, beta=beta)
-            board.move_pawn(player_id, player.row, player.col)
+        for move_row, move_col in valid_moves:
+            # Distance to goal (primary factor)
+            dist_to_goal = abs(move_row - goal_row)
+            score = -dist_to_goal * 10
+            
+            # Opponent proximity (try to block if adjacent)
+            dist_to_opponent = abs(move_row - opponent.row) + abs(move_col - opponent.col)
+            if dist_to_opponent < 3:
+                score += 5
+            
+            # Prefer moves that keep opponent further away
+            score += max(0, abs(opponent.row - goal_row) - dist_to_goal) * 2
             
             if score > best_score:
                 best_score = score
-                best_move = move
-            
-            alpha = max(alpha, best_score)
-            if beta <= alpha:
-                break
+                best_move = (move_row, move_col)
         
-        # Consider wall placement 30% of the time
+        # Consider wall placement 30% of the time if we have walls
         if random.random() < 0.3 and player.walls_remaining > 1:
             wall = self._strategic_wall_placement(board, player_id)
             if wall:
@@ -260,14 +264,21 @@ class QuoridorAI:
                     (new_row, new_col) not in visited):
                     
                     blocked = False
-                    if new_row < row:
-                        blocked = board.h_walls[row][col]
-                    elif new_row > row:
-                        blocked = board.h_walls[new_row][col]
-                    elif new_col < col:
-                        blocked = board.v_walls[row][col]
-                    else:
-                        blocked = board.v_walls[row][new_col]
+                    try:
+                        if new_row < row:  # Moving up
+                            if 0 <= row < len(board.h_walls) and 0 <= col < len(board.h_walls[0]):
+                                blocked = board.h_walls[row][col]
+                        elif new_row > row:  # Moving down
+                            if 0 <= new_row < len(board.h_walls) and 0 <= col < len(board.h_walls[0]):
+                                blocked = board.h_walls[new_row][col]
+                        elif new_col < col:  # Moving left
+                            if 0 <= row < len(board.v_walls) and 0 <= col < len(board.v_walls[0]):
+                                blocked = board.v_walls[row][col]
+                        else:  # Moving right
+                            if 0 <= row < len(board.v_walls) and 0 <= new_col < len(board.v_walls[0]):
+                                blocked = board.v_walls[row][new_col]
+                    except (IndexError, TypeError):
+                        blocked = False
                     
                     if not blocked:
                         visited.add((new_row, new_col))

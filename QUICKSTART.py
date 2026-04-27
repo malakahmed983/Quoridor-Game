@@ -1,0 +1,52 @@
+#!/usr/bin/env python3
+"""
+QUICK START GUIDE - Quoridor Game
+Run this for step-by-step instructions
+"""
+
+def print_menu():
+    print("\n" + "="*60)
+    print("QUORIDOR GAME - QUICK START")
+    print("="*60)
+    print("\n📋 PROJECT STATUS: ✅ COMPLETE AND TESTED")
+    print("\n🎮 GAME MODES:")
+    print("  1. Player vs Player (Local 2-Player)")
+    print("  2. Player vs Computer AI")
+    print("\n🤖 AI DIFFICULTY LEVELS:")
+    print("  • Easy: Random moves (beginner-friendly)")
+    print("  • Medium: Strategic play (default)")
+    print("  • Hard: Minimax with pruning (challenging)")
+    print("\n📦 INSTALLATION:")
+    print("  pip install -r requirements.txt")
+    print("\n🚀 TO START THE GAME:")
+    print("\n  Option 1 - Player vs Player:")
+    print("    python main.py")
+    print("\n  Option 2 - Player vs AI (Medium):")
+    print("    python main.py --mode pvc")
+    print("\n  Option 3 - Player vs Hard AI:")
+    print("    python main.py --mode pvc --difficulty hard")
+    print("\n🎮 CONTROLS:")
+    print("  Mouse:")
+    print("    • Click pawn to select")
+    print("    • Click green circle to move")
+    print("    • Click board to place wall")
+    print("\n  Keyboard:")
+    print("    • W      - Toggle wall placement mode")
+    print("    • R      - Rotate wall (horizontal/vertical)")
+    print("    • ESC    - Cancel current action")
+    print("    • SPACE  - Reset/restart game")
+    print("    • Q      - Quit game")
+    print("\n✅ TO RUN TESTS:")
+    print("  python -m unittest test_game.py -v")
+    print("\n📚 DOCUMENTATION:")
+    print("  • README.md       - User guide and overview")
+    print("  • DESIGN.md       - Design decisions and architecture")
+    print("  • CHALLENGES.md   - Implementation challenges solved")
+    print("  • IMPLEMENTATION.md - Complete project summary")
+    print("\n" + "="*60)
+    print()
+
+if __name__ == "__main__":
+    print_menu()
+    print("Ready to play? Run: python main.py")
+    print("\nFor AI opponent: python main.py --mode pvc --difficulty hard")
