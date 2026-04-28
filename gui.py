@@ -3,7 +3,6 @@ Quoridor Game GUI - Pygame-based graphical interface
 Handles rendering, user input, and game flow
 """
 
-import pygame
 import sys
 from typing import Optional, Tuple
 from game_logic import GameBoard, Wall
@@ -35,6 +34,8 @@ class QuoridorGUI:
             game_mode: "pvp" or "pvc"
             ai_difficulty: "easy", "medium", or "hard"
         """
+        import pygame
+        self.pygame = pygame
         pygame.init()
         
         self.game_mode = game_mode
@@ -86,12 +87,12 @@ class QuoridorGUI:
         Returns:
             False if user wants to quit
         """
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        for event in self.pygame.event.get():
+            if event.type == self.pygame.QUIT:
                 return False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+            elif event.type == self.pygame.MOUSEBUTTONDOWN:
                 self.handle_mouse_click(event.pos)
-            elif event.type == pygame.KEYDOWN:
+            elif event.type == self.pygame.KEYDOWN:
                 self.handle_key_press(event.key)
         return True
 
@@ -145,22 +146,22 @@ class QuoridorGUI:
 
     def handle_key_press(self, key: int):
         """Handle keyboard events"""
-        if key == pygame.K_w:
+        if key == self.pygame.K_w:
             # Toggle wall placement mode
             self.placing_wall = not self.placing_wall
             self.selected_cell = None
             self.valid_moves = []
-        elif key == pygame.K_r:
+        elif key == self.pygame.K_r:
             # Toggle wall orientation
             self.wall_orientation = not self.wall_orientation
-        elif key == pygame.K_ESCAPE:
+        elif key == self.pygame.K_ESCAPE:
             # Cancel wall placement
             self.placing_wall = False
             self.wall_preview = None
-        elif key == pygame.K_SPACE:
+        elif key == self.pygame.K_SPACE:
             # Reset game
             self.reset_game()
-        elif key == pygame.K_q:
+        elif key == self.pygame.K_q:
             # Quit
             return False
 
@@ -194,7 +195,7 @@ class QuoridorGUI:
         else:
             self.message = "Cannot place wall there!"
         
-        self.message_time = pygame.time.get_ticks()
+        self.message_time = self.pygame.time.get_ticks()
 
     def update(self):
         """Update game state"""
@@ -221,7 +222,7 @@ class QuoridorGUI:
             else:
                 self.current_player = 0
             
-            self.message_time = pygame.time.get_ticks()
+            self.message_time = self.pygame.time.get_ticks()
             self.ai_thinking = False
 
     def draw(self):
@@ -229,7 +230,7 @@ class QuoridorGUI:
         self.screen.fill(Colors.WHITE)
         
         # Draw board background
-        pygame.draw.rect(self.screen, Colors.LIGHT_GRAY,
+        self.pygame.draw.rect(self.screen, Colors.LIGHT_GRAY,
                         (self.margin, self.margin,
                          self.cell_size * self.board_size,
                          self.cell_size * self.board_size))
@@ -240,23 +241,23 @@ class QuoridorGUI:
             start_pos = (self.margin, self.margin + i * self.cell_size)
             end_pos = (self.margin + self.cell_size * self.board_size, 
                       self.margin + i * self.cell_size)
-            pygame.draw.line(self.screen, Colors.BLACK, start_pos, end_pos, 2)
+            self.pygame.draw.line(self.screen, Colors.BLACK, start_pos, end_pos, 2)
             
             # Vertical lines
             start_pos = (self.margin + i * self.cell_size, self.margin)
             end_pos = (self.margin + i * self.cell_size,
                       self.margin + self.cell_size * self.board_size)
-            pygame.draw.line(self.screen, Colors.BLACK, start_pos, end_pos, 2)
+            self.pygame.draw.line(self.screen, Colors.BLACK, start_pos, end_pos, 2)
         
         # Draw goal zones
         for col in range(self.board_size):
             # Top goal zone for Player 0
-            pygame.draw.rect(self.screen, Colors.LIGHT_BLUE,
+            self.pygame.draw.rect(self.screen, Colors.LIGHT_BLUE,
                            (self.margin + col * self.cell_size,
                             self.margin,
                             self.cell_size, self.cell_size))
             # Bottom goal zone for Player 1
-            pygame.draw.rect(self.screen, Colors.LIGHT_RED,
+            self.pygame.draw.rect(self.screen, Colors.LIGHT_RED,
                            (self.margin + col * self.cell_size,
                             self.margin + (self.board_size - 1) * self.cell_size,
                             self.cell_size, self.cell_size))
@@ -268,7 +269,7 @@ class QuoridorGUI:
         for col, row in self.valid_moves:
             x = self.margin + col * self.cell_size + self.cell_size // 2
             y = self.margin + row * self.cell_size + self.cell_size // 2
-            pygame.draw.circle(self.screen, Colors.GREEN, (x, y), 8)
+            self.pygame.draw.circle(self.screen, Colors.GREEN, (x, y), 8)
         
         # Draw pawns
         self.draw_pawns()
@@ -284,7 +285,7 @@ class QuoridorGUI:
                 if self.board.h_walls[row][col]:
                     x = self.margin + col * self.cell_size + self.cell_size
                     y = self.margin + row * self.cell_size
-                    pygame.draw.rect(self.screen, Colors.BLACK,
+                    self.pygame.draw.rect(self.screen, Colors.BLACK,
                                    (x - self.wall_width // 2, y - self.wall_width // 2,
                                     self.cell_size, self.wall_width))
         
@@ -294,7 +295,7 @@ class QuoridorGUI:
                 if self.board.v_walls[row][col]:
                     x = self.margin + col * self.cell_size
                     y = self.margin + row * self.cell_size + self.cell_size
-                    pygame.draw.rect(self.screen, Colors.BLACK,
+                    self.pygame.draw.rect(self.screen, Colors.BLACK,
                                    (x - self.wall_width // 2, y - self.wall_width // 2,
                                     self.wall_width, self.cell_size))
 
@@ -305,8 +306,8 @@ class QuoridorGUI:
             y = self.margin + player.row * self.cell_size + self.cell_size // 2
             
             color = Colors.BLUE if player_id == 0 else Colors.RED
-            pygame.draw.circle(self.screen, color, (x, y), 15)
-            pygame.draw.circle(self.screen, Colors.BLACK, (x, y), 15, 3)
+            self.pygame.draw.circle(self.screen, color, (x, y), 15)
+            self.pygame.draw.circle(self.screen, Colors.BLACK, (x, y), 15, 3)
 
     def draw_ui(self):
         """Draw UI elements"""
@@ -334,7 +335,7 @@ class QuoridorGUI:
         self.screen.blit(text_surface, (self.margin, ui_y + 65))
         
         # Draw messages
-        if pygame.time.get_ticks() - self.message_time < 3000:
+        if self.pygame.time.get_ticks() - self.message_time < 3000:
             msg_surface = self.font_medium.render(self.message, True, Colors.BLACK)
             self.screen.blit(msg_surface, (self.margin, ui_y + 90))
         
@@ -343,7 +344,7 @@ class QuoridorGUI:
             winner_text = f"Player {self.winner} Wins!"
             text_surface = self.font_large.render(winner_text, True, Colors.BLACK)
             text_rect = text_surface.get_rect(center=(self.screen_width // 2, self.screen_height // 2))
-            pygame.draw.rect(self.screen, Colors.YELLOW, text_rect.inflate(20, 20))
+            self.pygame.draw.rect(self.screen, Colors.YELLOW, text_rect.inflate(20, 20))
             self.screen.blit(text_surface, text_rect)
 
     def reset_game(self):
@@ -353,7 +354,7 @@ class QuoridorGUI:
         self.game_over = False
         self.winner = None
         self.message = "Game reset. Player 0's turn"
-        self.message_time = pygame.time.get_ticks()
+        self.message_time = self.pygame.time.get_ticks()
         self.selected_cell = None
         self.valid_moves = []
 
@@ -366,10 +367,10 @@ class QuoridorGUI:
             self.update()
             self.draw()
             
-            pygame.display.flip()
+            self.pygame.display.flip()
             self.clock.tick(60)  # 60 FPS
         
-        pygame.quit()
+        self.pygame.quit()
         sys.exit()
 
 
